@@ -19,7 +19,7 @@ using System.Windows.Media;
 using Y_Track.DAL;
 using Y_Track.DAL.Models;
 using Y_Track.Extentions;
-using Y_Track.Fiddler;
+using Y_Track.Titanium;
 using Y_Track.UI;
 using Y_Track.UserControls;
 using Y_Track.UserControls.MenuItemsUserControls;
@@ -131,8 +131,11 @@ namespace Y_Track
                 Dispatcher.Invoke(delegate
                 {
                     string[] proxyLocalEndPoints = YoutubeInterceptEngine.Instance.SystemProxyAddress.Split(new[] { ";" }, StringSplitOptions.None);
-                    this.HttpProxyEndpoint.Text = proxyLocalEndPoints[0];
-                    this.HttpsProxyEndpoint.Text = proxyLocalEndPoints[1];
+                    if (proxyLocalEndPoints != null && proxyLocalEndPoints.Length > 1)
+                    {
+                        this.HttpProxyEndpoint.Text = proxyLocalEndPoints[0];
+                        this.HttpsProxyEndpoint.Text = proxyLocalEndPoints[1];
+                    }
 
                     t.Stop();
                 });

@@ -1,5 +1,4 @@
-﻿using Fiddler;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -7,9 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
+using Titanium.Web.Proxy.EventArguments;
 using Y_Track.Extentions;
-using Y_Track.Fiddler;
 using Y_Track.Helpers;
+using Y_Track.Titanium;
 using Y_Track.YoutubeCaptureEngine.Models;
 
 namespace Y_Track.YoutubeCaptureEngine
@@ -76,7 +77,7 @@ namespace Y_Track.YoutubeCaptureEngine
         private readonly string DUMMY_CLIENT_CHATTER_PATH = "www.youtube_chatter_dummy.com";
         private string TrackingScript;
         private List<string> _downloadedBefore = new List<string>();
-        private FiddlerApplicationManager _fiddlerManager;
+        private Titanium.TitaniumManager _titaniumManager;
         private HttpClient _client;
 
         private static YoutubeInterceptEngine _instance;
@@ -91,7 +92,7 @@ namespace Y_Track.YoutubeCaptureEngine
                 if (_instance == null)
                 {
                     _instance = new YoutubeInterceptEngine();
-                    _instance._fiddlerManager = new FiddlerApplicationManager();
+                    _instance._titaniumManager = Titanium.TitaniumManager.Instance;
                     _instance.TrackingScript = _instance._readTrackerScript();
                     _instance.VideosManagers = new ObservableCollection<YoutubeVideoManager>();
                     _instance._client = new HttpClient();
@@ -120,52 +121,8 @@ namespace Y_Track.YoutubeCaptureEngine
         };
 
 
-        /// <summary>
-        /// starts youtube intercepting
-        /// </summary>
-        /// <param name="proxyPort">port for the MLIMA proxy</param>
-        public async void StartIntercepting(int proxyPort)
-        {
-            if (!IsStarted)
-            {
-                await _fiddlerManager.StartFiddler(proxyPort);
-                FiddlerApplication.AfterSessionComplete += YoutubeHandler;
-                FiddlerApplication.BeforeRequest += FiddlerApplication_BeforeRequest;
-                FiddlerApplication.BeforeResponse += FiddlerApplication_BeforeResponse;
-                FiddlerApplication.ResponseHeadersAvailable += FiddlerApplication_ResponseHeadersAvailable;
-                IsStarted = true;
-            }
-        }
 
-        /// <summary>
-        /// Stops the interceptor
-        /// </summary>
-        public async void StopIntercepting()
-        {
-            if (IsStarted)
-            {
-                FiddlerApplication.AfterSessionComplete -= YoutubeHandler;
-                FiddlerApplication.BeforeRequest -= FiddlerApplication_BeforeRequest;
-                FiddlerApplication.BeforeResponse -= FiddlerApplication_BeforeResponse;
-                FiddlerApplication.ResponseHeadersAvailable -= FiddlerApplication_ResponseHeadersAvailable;
-                await _fiddlerManager.StopFiddler();
-                IsStarted = false;
-            }
-        }
 
-        private string getSystemProxyEndPoint()
-        {
-
-            try
-            {
-                return Fiddler.SystemProxyManager.GetSystemProxyEndPoint();
-            }
-            catch
-            {
-                Y_Track.Helpers.YTrackLogger.Log("Cannot read ProxyServer URI");
-                return null;
-            }
-        }
 
         private string _readTrackerScript()
         {
@@ -177,41 +134,76 @@ namespace Y_Track.YoutubeCaptureEngine
 
 
 
-        private void FiddlerApplication_ResponseHeadersAvailable(Session oSession)
+
+        private string getSystemProxyEndPoint()
         {
-            if (isYoutubeInjectablePage(oSession))
+
+            try
             {
-                _handleCachingHeaders(ref oSession);
+                return SystemProxyManager.GetSystemProxyEndPoint();
+            }
+            catch
+            {
+                Y_Track.Helpers.YTrackLogger.Log("Cannot read ProxyServer URI");
+                return null;
             }
         }
 
 
-        private void _handleCachingHeaders(ref Session session)
+
+
+
+        /// <summary>
+        /// starts youtube intercepting
+        /// </summary>
+        /// <param name="proxyPort">port for the MLIMA proxy</param>
+        public async void StartIntercepting(int proxyPort)
         {
-            // this allows the response session to be modefied 
-            session.bBufferResponse = true;
-
-            // forcing to response reply with text/html pure page without any compression
-            session.oRequest.headers.Remove("Accept-Encoding");
-
-            // prevent the browser from caching the main/watch page 
-            // to make sure the tracker is injected with each reponse (prevent caching it)
-            session.oRequest.headers.Remove("Last-Modefied");
-            session.oRequest.headers.Remove("ETag");
-            session.oRequest.headers["Expires"] = "0";
-            session.oRequest.headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-            session.oRequest.headers.Add("Pragma", "no-cache");
-            session.oRequest.headers.Add("Vary", "*");
+            if (!IsStarted)
+            {
+                var started = await _titaniumManager.Start(proxyPort);
+                _titaniumManager.Proxy.BeforeRequest += Proxy_BeforeRequest;
+                _titaniumManager.Proxy.BeforeResponse += Proxy_BeforeResponse;
+                IsStarted = true;
+            }
         }
 
-        private void FiddlerApplication_BeforeResponse(Session oSession)
+
+
+        /// <summary>
+        /// Stops the interceptor
+        /// </summary>
+        public async void StopIntercepting()
         {
-            if (isYoutubeInjectablePage(oSession))
+            if (IsStarted)
             {
-                _injectTrackingChatterScript(ref oSession);
+                _titaniumManager.Proxy.BeforeRequest -= Proxy_BeforeRequest;
+                _titaniumManager.Proxy.BeforeRequest -= Proxy_BeforeResponse;
+                await _titaniumManager.Stop();
+                IsStarted = false;
+            }
+        }
+
+
+        private Task Proxy_BeforeRequest(object sender, SessionEventArgs session)
+        {
+
+            if (isYoutubeChatterMessage(session))
+            {
+                _handleChatterMessage(session?.HttpClient?.Request.RequestUri?.AbsoluteUri);
+            }
+
+            return Task.FromResult(0);
+        }
+
+        private async Task Proxy_BeforeResponse(object sender, SessionEventArgs session)
+        {
+            if (isYoutubeInjectablePage(session))
+            {
+                await _injectTrackingChatterScript(session);
 
                 // see if this is youtube main page  response
-                if (isYoutubeMainPageDetected(oSession))
+                if (isYoutubeMainPageDetected(session))
                 {
                     // raise session detection event
                     this.OnYoutubeSessionDetected?.Invoke(this, EventArgs.Empty);
@@ -220,29 +212,47 @@ namespace Y_Track.YoutubeCaptureEngine
 
             // if this is a chatter message return 200 response 
             // Technically this response will be ignored from the client tracker side)
-            if (isYoutubeChatterMessage(oSession))
+            if (isYoutubeChatterMessage(session))
             {
-                oSession.oResponse.headers.SetStatus(200, "OK");
+                session.Ok("<b>OK</b>");
+            }
+
+            // handle youtube packets
+            if (isYoutubeVideoPacket(session))
+            {
+                await _handleYoutubePacket(session);
             }
         }
 
 
 
-        private void FiddlerApplication_BeforeRequest(Session oSession)
+
+
+
+        private bool isYoutubeMainPageDetected(SessionEventArgs session)
         {
-            if (isYoutubeInjectablePage(oSession))
-            {
-                oSession.bBufferResponse = true;
-                _handleCachingHeaders(ref oSession);
-            }
-
-
-            if (isYoutubeChatterMessage(oSession))
-            {
-                _handleChatterMessage(oSession.oRequest.headers.RequestPath);
-                oSession.bBufferResponse = true;
-            }
+            return (session?.HttpClient?.Request.RequestUri?.AbsolutePath == "/"
+                && session?.HttpClient?.Request.Host == "www.youtube.com");
         }
+
+
+
+        private async Task _injectTrackingChatterScript(SessionEventArgs session)
+        {
+            // getting the request body 
+            string reponseString = await session.GetResponseBodyAsString();
+            // finding end head tag and replace it with the javascript tracker
+            string injectedResponse = reponseString.Replace("</head>", "<script>" + this.TrackingScript + "</script>" + "</head>");
+            // turning the injected document into byte[] 
+            byte[] toInjectBytes = System.Text.Encoding.UTF8.GetBytes(injectedResponse);
+            // replace the response with the injected one
+            session.Ok(toInjectBytes);
+        }
+
+
+
+
+     
 
         private void _handleChatterMessage(string requestPath)
         {
@@ -261,80 +271,88 @@ namespace Y_Track.YoutubeCaptureEngine
             }
         }
 
-        private void YoutubeHandler(Session oSession)
-        {
-            // handle youtube packets
-            if (isYoutubeVideoPacket(oSession))
-            {
-                _handleYoutubePacket(oSession);
-            }
-        }
-
-
-        private bool isYoutubeMainPageDetected(Session session)
-        {
-            return (session.oRequest.headers.RequestPath == "/" || session.oRequest.headers.RequestPath.IndexOf("/?") > -1)
-                && session.oRequest.host == "www.youtube.com";
-        }
-
-
-        private bool isYoutubeInjectablePage(Session session)
-        {
-            // TODO :: check also if this is a html page by content-type
-            // if the session is originated from the watch?v={video_id} page or the main page return true
-            return (session.oRequest.headers.RequestPath == "/" || session.oRequest.headers.RequestPath.IndexOf("/watch?") > -1 || session.oRequest.headers.RequestPath.IndexOf("/?") > -1)
-                && session.oRequest.host == "www.youtube.com";
-        }
-
-        private bool isYoutubeChatterMessage(Session session)
+        private bool isYoutubeChatterMessage(SessionEventArgs session)
         {
             // is this coming from youtube chatter javascript client ?
             return
-                session?.oRequest?.headers?.RequestPath != null
-                && session.oRequest.headers.RequestPath.IndexOf(DUMMY_CLIENT_CHATTER_PATH) > -1;
+                session?.HttpClient?.Request.RequestUri?.AbsolutePath != null
+                && session?.HttpClient?.Request.RequestUri?.AbsolutePath.IndexOf(DUMMY_CLIENT_CHATTER_PATH) > -1;
         }
 
-        private bool isYoutubeVideoPacket(Session session)
+        private void _handleCachingHeaders(ref SessionEventArgs session)
         {
+
+            // forcing to response reply with text/html pure page without any compression
+            session.HttpClient.Request.Headers.RemoveHeader("Accept-Encoding");
+
+            // prevent the browser from caching the main/watch page 
+            // to make sure the tracker is injected with each reponse (prevent caching it)
+            session.HttpClient.Request.Headers.RemoveHeader("Last-Modefied");
+            session.HttpClient.Request.Headers.RemoveHeader("ETag");
+
+            session.HttpClient.Request.Headers.RemoveHeader("Expires");
+            session.HttpClient.Request.Headers.AddHeader("Expires", "0");
+            session.HttpClient.Request.Headers.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            session.HttpClient.Request.Headers.AddHeader("Pragma", "no-cache");
+            session.HttpClient.Request.Headers.AddHeader("Vary", "*");
+        }
+
+        private bool isYoutubeInjectablePage(SessionEventArgs session)
+        {
+            // TODO :: check also if this is a html page by content-type
+            // if the session is originated from the watch?v={video_id} page or the main page return true
+            return (session.HttpClient.Request.RequestUri.AbsolutePath == "/" || session.HttpClient.Request.RequestUri.AbsolutePath.IndexOf("/watch") > -1)
+                && session.HttpClient.Request.Host == "www.youtube.com";
+        }
+
+
+
+
+
+
+        private bool isYoutubeVideoPacket(SessionEventArgs session)
+        {
+            var isMediaContentType = isMediaContent(session);
+
+            if (!isMediaContentType) return false;
+            var isPlayback = isYoutubePlayback(session);
+            var isYoutubeOriginated = isYoutubeOriginatedMedia(session);
             return
-                // check if the response contains media data
-                session.ResponseHeaders["Content-Type"].OICStartsWithAny(YoutubeVideoMIMEs)
-                // check if media data comes from youtube playback
-                && session.oRequest.headers.RequestPath.Contains("/videoplayback?")
-                // check if playback is originated by youtube
-                && session.RequestHeaders["Origin"].IndexOf("https://www.youtube.com") > -1
+                isMediaContentType && isPlayback && isYoutubeOriginated
                 // check if the request are not coming from YTrack 
                 // if it's so then it's comming from PlayerWindow and we don't want to intercept it
                 // if session.LocalProcessID is 0 then MITM Proxy can't say from where the request came, 
                 // in this case i'll assume it's not coming from PlayerWindow
-                && (session.LocalProcessID != Process.GetCurrentProcess().Id || session.LocalProcessID == 0);
-
-
+                && (session.HttpClient.ProcessId.Value != Process.GetCurrentProcess().Id || session.HttpClient.ProcessId.Value == 0);
         }
 
-        private YoutubeMediaPacketType _parseMediaPacketType(string sessionContentType)
+        private bool isYoutubeOriginatedMedia(SessionEventArgs session)
         {
-
-            // returns the videoMediaType from a contentType header
-            YoutubeMediaPacketType PacketType = YoutubeMediaPacketType.Unknown;
-
-            if (sessionContentType.OICStartsWith("video"))
-                PacketType = YoutubeMediaPacketType.Video;
-
-            if (sessionContentType.OICStartsWith("audio"))
-                PacketType = YoutubeMediaPacketType.Audio;
-
-            return PacketType;
+            // check if playback is originated by youtube
+            return (session.HttpClient.Request.Headers.Headers.ContainsKey("Origin") && session.HttpClient.Request.Headers.Headers["Origin"].Value.IndexOf("https://www.youtube.com") > -1)
+            ||
+            (session.HttpClient.Request.Headers.Headers.Keys.Contains("Timing-Allow-Origin") && session.HttpClient.Request.Headers.Headers["Timing-Allow-Origin"].Value.IndexOf("https://www.youtube.com") > -1);
         }
 
-        //debugging
-        private List<string> y_videos_hosts = new List<string>();
+        private bool isYoutubePlayback(SessionEventArgs session)
+        {
+            // check if media data comes from youtube playback
+            return session.HttpClient.Request.RequestUri.AbsolutePath.Contains("/videoplayback");
+        }
 
-        private void _handleYoutubePacket(Session session)
+        private bool isMediaContent(SessionEventArgs session)
+        {
+            // check if the response contains media data
+            return (session.HttpClient.Response.Headers.Headers.ContainsKey("Content-Type")
+            && session.HttpClient.Response.Headers.Headers["Content-Type"].Value.StartWithAny(YoutubeVideoMIMEs));
+        }
+
+
+        private async Task _handleYoutubePacket(SessionEventArgs session)
         {
 
             // check if the packet in session is Audio or Video
-            YoutubeMediaPacketType PacketType = _parseMediaPacketType(session.ResponseHeaders["Content-Type"]);
+            YoutubeMediaPacketType PacketType = _parseMediaPacketType(session.HttpClient.Response.Headers.Headers["Content-Type"].Value);
 
             // if content type is not video nor audio cancel it
             if (PacketType == YoutubeMediaPacketType.Unknown) return;
@@ -342,10 +360,10 @@ namespace Y_Track.YoutubeCaptureEngine
             var requestURL = requestURLFromSession(session);
 
             // making sure that the packet is valid to parse
-            if (!YoutubeMediaPacket.IsValidYoutubeRequestURL(requestURL))
-                return;
+            if (!YoutubeMediaPacket.IsValidYoutubeRequestURL(requestURL)) return;
 
-            var newPacket = new YoutubeMediaPacket(PacketType, requestURL, session.responseBodyBytes);
+            byte[] bodyBytes = await session.GetResponseBody();
+            var newPacket = new YoutubeMediaPacket(PacketType, requestURL, bodyBytes);
 
             // if videos list contains a video with the same fingerprint append the packet to it 
             // otherwise create another video and add new packet to
@@ -366,6 +384,36 @@ namespace Y_Track.YoutubeCaptureEngine
             }
         }
 
+
+        private YoutubeMediaPacketType _parseMediaPacketType(string sessionContentType)
+        {
+            // returns the videoMediaType from a contentType header
+            YoutubeMediaPacketType PacketType = YoutubeMediaPacketType.Unknown;
+
+            if (sessionContentType.StartsWith("video"))
+                PacketType = YoutubeMediaPacketType.Video;
+
+            if (sessionContentType.StartsWith("audio"))
+                PacketType = YoutubeMediaPacketType.Audio;
+
+            return PacketType;
+        }
+
+
+
+        private YoutubeRequestURL requestURLFromSession(SessionEventArgs session)
+        {
+            YoutubePlaybackRequestPath youtubeRequestPath = YoutubePlaybackRequestPathParser.ParseRequestPathString(session.HttpClient.Request.RequestUri.PathAndQuery);
+            string host = session.HttpClient.Request.Host;
+            return new YoutubeRequestURL()
+            {
+                RequestPath = youtubeRequestPath,
+                Host = host
+            };
+        }
+
+
+
         private void NewVideoManager_OnYoutubeStored(object sender, string finalVideoPath)
         {
             var manager = sender as YoutubeVideoManager;
@@ -377,30 +425,6 @@ namespace Y_Track.YoutubeCaptureEngine
             YoutubeVideoManager videoManager = sender as YoutubeVideoManager;
             OnNewVideoLastPacketRecieved?.Invoke(videoManager);
         }
-
-        private YoutubeRequestURL requestURLFromSession(Session session)
-        {
-            YoutubePlaybackRequestPath youtubeRequestPath = YoutubePlaybackRequestPathParser.ParseRequestPathString(session.oRequest.headers.RequestPath);
-            string host = session.oRequest.host;
-            return new YoutubeRequestURL()
-            {
-                RequestPath = youtubeRequestPath,
-                Host = host
-            };
-        }
-
-        private void _injectTrackingChatterScript(ref Session oSession)
-        {
-            // getting the request body 
-            string reponseString = oSession.GetResponseBodyAsString();
-            // finding end head tag and replace it with the javascript tracker
-            string injectedResponse = reponseString.Replace("</head>", "<script>" + this.TrackingScript + "</script>" + "</head>");
-            // turning the injected document into byte[] 
-            byte[] toInjectBytes = System.Text.Encoding.UTF8.GetBytes(injectedResponse);
-            // replace the response with the injected one
-            oSession.ResponseBody = toInjectBytes;
-        }
-
 
 
     }

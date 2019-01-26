@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Y_Track.Fiddler
+namespace Y_Track.Titanium
 {
-    public class FiddlerStatusEventArguments : EventArgs
+    public enum ProxyStatus
     {
-        public FiddlerStatus Status { set; get; }
+        Started,
+        Stopped
     }
 }

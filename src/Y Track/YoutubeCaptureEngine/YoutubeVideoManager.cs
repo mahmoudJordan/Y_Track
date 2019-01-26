@@ -99,6 +99,7 @@ namespace Y_Track.YoutubeCaptureEngine
             // if the video is stored or being stored don't add any packets
             if (this.VideoBeingStored || VideoStored) return;
 
+            Debug.WriteLine("adding " + newPacketToAdd.VideoPacketType.ToString() + " Packet : " + newPacketToAdd.Range.Start + "-" + newPacketToAdd.Range.End);
 
             // check if the new coming packets are having a different video quality than exiting packets 
             // if so .. remove them and consider all of them as a gabs to fill in the final step
@@ -291,9 +292,12 @@ namespace Y_Track.YoutubeCaptureEngine
         {
             return await Task.Run(() =>
             {
+                Debug.WriteLine(type + " packets clen : " + this.Video.Packets.Where(x => x.VideoPacketType == type).First().OverAllLength);
                 var sorted = this.Video.Packets.Where(x => x.VideoPacketType == type).OrderBy(x => x.Range.Start).ToList();
                 sorted.ForEach(item =>
                 {
+                    Debug.WriteLine("Appending Packet : " + item.VideoPacketType.ToString() + " " + item.Range.Start + "-" + item.Range.End + " :: " + item.FilePath);
+
                     Helpers.Misc.AppendAllBytes(filePath, File.ReadAllBytes(item.FilePath));
                 });
                 return true;
@@ -405,9 +409,6 @@ namespace Y_Track.YoutubeCaptureEngine
             // now loop throught all lost packets and fill them 
             foreach (var lostRange in lostPacketsRanges)
             {
-                Debug.WriteLine("Filling the Broken Range : " + lostRange);
-                Debug.WriteLine("From : " + lostPacketRequestURL.ToRequestableURL());
-
                 var newPacket = await _fillGab(lostPacketRequestURL, lostRange, lostPacketsType);
                 _insertGabPacket(newPacket);
             }

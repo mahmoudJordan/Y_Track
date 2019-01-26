@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
-namespace Y_Track.Fiddler
+namespace Y_Track.Titanium
 {
     public static class SystemProxyManager
     {

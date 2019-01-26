@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Y_Track.Titanium;
 
 namespace Y_Track
 {
@@ -55,7 +56,7 @@ namespace Y_Track
 
         private void _handleUnhandledExceptions(Exception e)
         {
-            Fiddler.SystemProxyManager.StopSystemProxy();
+            SystemProxyManager.StopSystemProxy();
             Helpers.YTrackLogger.Log("Unhandled Exception Occured : " + e.Message + "\n\n" + e.StackTrace);
         }
 

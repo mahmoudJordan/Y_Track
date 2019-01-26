@@ -77,5 +77,20 @@ namespace Y_Track.Extentions
             }
             return -1;
         }
+
+
+
+        public static bool StartWithAny(this string toCheck, List<string> strings)
+        {
+            return strings.Any(o => o.StartsWith(toCheck));
+        }
+        public static bool StartWithAny(this string toCheck, string[] strings)
+        {
+            var toLower = toCheck.ToLower();
+            return strings.Any(o => toCheck.StartsWith(o));
+        }
+
+
+
     }
 }
