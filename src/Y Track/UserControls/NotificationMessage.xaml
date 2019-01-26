@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="Y_Track.UserControls.NotificationMessage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Y_Track.UserControls"
+             mc:Ignorable="d" 
+             Height="108.658" Width="400.122">
+    <Grid>
+        <StackPanel Margin="7 0 0 0" Grid.Column="1">
+            <TextBlock Padding="2"  Foreground="White" FontSize="14" TextAlignment="Center" FontWeight="Bold"  Background="Transparent" x:Name="MessageTitle" TextWrapping="Wrap" >Message</TextBlock>
+            <TextBlock Padding="2" Foreground="White" FontSize="14" TextWrapping="Wrap" x:Name="MessageText"></TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>

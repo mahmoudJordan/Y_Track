@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="Y_Track.UserControls.VideoCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Y_Track.UserControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Regular"
+             TextElement.FontSize="13"
+             TextOptions.TextFormattingMode="Ideal" 
+             TextOptions.TextRenderingMode="Auto"     
+             mc:Ignorable="d" Margin="10" HorizontalAlignment="Stretch" >
+
+
+    <Grid><!--Background="#232b2c"-->
+        <materialDesign:Card    Height="300" Background="#222222" Opacity="0.9" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="140" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Image x:Name="CardImage" Stretch="UniformToFill" />
+                <Button x:Name="WatchVideoButton" Click="WatchVideoButton_Click" Grid.Row="0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Background="#232b2c" BorderBrush="#434f50" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Margin="0 0 16 -20">
+                    <materialDesign:PackIcon Kind="Eye" Background="Transparent" Foreground="White" />
+                </Button>
+                <StackPanel  Grid.Row="1" Margin="8 24 8 0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <TextBlock Foreground="DarkGray" ToolTipService.ShowDuration="12000" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" x:Name="VideoTitle" FontWeight="Bold"> Cycling</TextBlock>
+                    <TextBlock Foreground="DarkGray" ToolTipService.ShowDuration="12000" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" x:Name="VideoDescription"  TextWrapping="Wrap" VerticalAlignment="Center">A great way to keep fit and forget about the constant grind of IT.</TextBlock>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Right" Grid.Row="2" Orientation="Horizontal"  Margin="8">
+                    <Button x:Name="OpenButton" Click="OpenButton_Click"  Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0" materialDesign:RippleAssist.IsCentered="True">
+                        <materialDesign:PackIcon Kind="Folder" />
+                    </Button>
+                    <Button x:Name="DeleteVideoButton" Click="DeleteVideoButton_Click" Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0" materialDesign:RippleAssist.IsCentered="True">
+                        <materialDesign:PackIcon Kind="TrashCan" />
+                    </Button>
+                    <materialDesign:PopupBox  Padding="2 0 2 0">
+                        <StackPanel>
+                            <Button Content="More" />
+                            <Button  Content="Options" />
+                        </StackPanel>
+                    </materialDesign:PopupBox>
+                </StackPanel>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

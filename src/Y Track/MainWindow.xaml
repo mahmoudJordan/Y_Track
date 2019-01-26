@@ -1,0 +1,198 @@
+﻿<Window x:Class="Y_Track.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Y_Track.UserControls"
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Title="MainWindow" Height="600" Width="800" WindowStartupLocation="CenterScreen" AllowsTransparency="True" 
+        Background="#171717"  Opacity="0.9"  Closing="Window_Closing" WindowStyle="None"  MouseDown="Window_MouseDown">
+    <!--Background="{DynamicResource MaterialDesignBackground}"-->
+    <!--<Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard>
+                <Storyboard Duration="00:00:13" Storyboard.TargetProperty="Opacity">
+                    <DoubleAnimation From="0" To="0.9"/> -->
+    <!-- To was 0.85-->
+    <!--
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>-->
+    <Window.Resources>
+        <Style x:Key="ButtonHover" TargetType="{x:Type Button }">
+            <Setter Property="Background" Value="#101010"/>
+            <Setter Property="Foreground" Value="WhiteSmoke"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="Black" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="WhiteSmoke"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <!-- SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}">-->
+        <materialDesign:DialogHost Identifier="RootDialog"  Grid.ColumnSpan="2" Margin="0,0,-0.4,0.2">
+            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+                <materialDesign:DrawerHost.LeftDrawerContent>
+                    <DockPanel MinWidth="212">
+                        <ToggleButton Grid.Row="0" Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                                    DockPanel.Dock="Top"
+                                    HorizontalAlignment="Right" Margin="16"
+                                    IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
+                        <Grid>
+                            <ListBox x:Name="ItemsListBox" Margin="0 16 0 16" SelectedIndex="0"                         
+                             ItemsSource="{Binding MenuItems}"
+                                      PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="UI:MenuItem">
+                                        <TextBlock Text="{Binding Name}" Margin="32 0 32 0" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </DockPanel>
+                </materialDesign:DrawerHost.LeftDrawerContent>
+                <DockPanel >
+
+                    <!--Mode="Accent"-->
+                    <materialDesign:ColorZone Padding="16" Background="#171717" materialDesign:ShadowAssist.ShadowDepth="Depth2" Foreground="white" DockPanel.Dock="Top">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+
+
+
+                            <DockPanel Grid.Row="0" x:Name="MainNavigationPanel">
+                                <ToggleButton Grid.Row="0" Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False"
+                                        x:Name="MenuToggleButton"/>
+                                <!--Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"-->
+                                <WrapPanel HorizontalAlignment="Right" Grid.Row="0" DockPanel.Dock="Right">
+                                    <Button x:Name="MinimizeButton" Height="25" Width="25" Padding="0" Background="Transparent" BorderThickness="0" PreviewMouseDown="MinimizeButton_PreviewMouseDown">
+                                        <materialDesign:PackIcon  Kind="WindowMinimize" BorderBrush="Transparent" />
+                                    </Button>
+                                    <Button x:Name="MaximizeButton" Height="25" Width="25" Padding="0" Background="Transparent" BorderThickness="0" PreviewMouseDown="ToggleMaximizeButton_PreviewMouseDown">
+                                        <materialDesign:PackIcon  Kind="WindowMaximize" BorderBrush="Transparent" />
+                                    </Button>
+                                    <Button x:Name="ResetWindowButton" Visibility="Collapsed" Height="25" Width="25" Padding="0" Background="Transparent" BorderThickness="0" PreviewMouseDown="ToggleMaximizeButton_PreviewMouseDown">
+                                        <materialDesign:PackIcon  Kind="WindowRestore" BorderBrush="Transparent" />
+                                    </Button>
+                                    <Button x:Name="CloseButton" Height="25" Width="25" Padding="0" Background="Transparent" BorderThickness="0" PreviewMouseDown="CloseButton_PreviewMouseDown">
+                                        <materialDesign:PackIcon  Kind="Close" BorderBrush="Transparent" />
+                                    </Button>
+
+                                </WrapPanel>
+
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22">Y-Track</TextBlock>
+                            </DockPanel>
+
+                            <Button Visibility="Collapsed"
+                                  Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
+                                  ToolTip="MaterialDesignFloatingActionDarkButton">
+                                <Button.CommandParameter>
+                                    <StackPanel Margin="50" x:Name="DialogHostContents" >
+                                        <ProgressBar Style="{DynamicResource MaterialDesignCircularProgressBar}" HorizontalAlignment="Center"  Margin="16" IsIndeterminate="True" Value="0" />
+                                        <TextBlock>Loading Videos</TextBlock>
+                                    </StackPanel>
+                                </Button.CommandParameter>
+                                <materialDesign:PackIcon Kind="Search" Height="24" Width="24" />
+                            </Button>
+
+                            <DockPanel  Grid.Row="1" Margin="0,10,0,0" Visibility="Visible" x:Name="SearchPanel" Background="#2d2d2d">
+                                <Grid Visibility="Visible">
+                                    <TextBox Style="{x:Null}" Background="#2d2d2d" Padding="5" FontSize="16" HorizontalAlignment="Stretch"  VerticalAlignment="Center"  x:Name="SearchTermTextBox" BorderThickness="0" Foreground="DarkGray" Margin="5" KeyDown="SearchTermTextBox_KeyDown"/>
+                                    <TextBlock IsHitTestVisible="False" Text="Enter Search Your Files History Or Video URL" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=SearchTermTextBox}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+
+                    </materialDesign:ColorZone>
+                    <ProgressBar x:Name="LoadingBar" DockPanel.Dock="Top"  IsIndeterminate="True"  Background="Gray" BorderBrush="Transparent" Foreground="DarkGray"/>
+                    <ScrollViewer Margin="0" DockPanel.Dock="Bottom" 
+                                  HorizontalScrollBarVisibility="{Binding ElementName=ItemsListBox, Path=SelectedItem.HorizontalScrollBarVisibilityRequirement}"
+                                  VerticalScrollBarVisibility="Auto"
+                                  ScrollChanged="WrapperScrollViewer_ScrollChanged">
+                        <ContentControl Margin="0" Content="{Binding ElementName=ItemsListBox, Path=SelectedItem.Content}" />
+                    </ScrollViewer>
+                    <!--Padding="{Binding ElementName=ItemsListBox, Path=SelectedItem.MarginRequirement}"-->
+
+                </DockPanel>
+            </materialDesign:DrawerHost>
+        </materialDesign:DialogHost>
+
+        <!-- footer -->
+        <materialDesign:ColorZone Grid.Row="1" Padding="2" Height="60" materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                              Background="#171717" Foreground="white"  Margin="0,0,0,0" >
+
+            <DockPanel Height="50" Margin="0,0,0,0">
+                <DockPanel Height="50" DockPanel.Dock="Right" Margin="10,10,15,-10.4" Width="247">
+                    <Label  Foreground="#bbbbbb">Tracker :</Label>
+                    <ToggleButton x:Name="TrackerStartStopToggle"  Style="{StaticResource MaterialDesignSwitchDarkToggleButton}"
+                        ToolTip="MaterialDesignSwitchDarkToggleButton"
+                        Background="#5a6a6b" VerticalAlignment="Center"
+                        IsChecked="True" Height="27" Margin="0,0,0,22.6" Click="TrackerStartStopToggle_Click" />
+                    <StackPanel>
+                        <TextBlock x:Name="HttpProxyEndpoint" Margin="10,0,0,2" Foreground="#bbbbbb"></TextBlock>
+                        <TextBlock x:Name="HttpsProxyEndpoint" Margin="10,0,0,0" Foreground="#bbbbbb"></TextBlock>
+                    </StackPanel>
+                   
+                </DockPanel>
+                <DockPanel DockPanel.Dock="Left">
+                    <Image Width="33" DockPanel.Dock="Left" Margin="2,2,2,0.6" Cursor="Hand">
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Setter Property="Source" Value="Resources/github-normal.png"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Source" Value="Resources/github-hover.png"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                    <ProgressBar x:Name="CircularLoading" Style="{StaticResource MaterialDesignCircularProgressBar}" Value="0" Margin="15 ,0,0,0" Foreground="Gray" IsIndeterminate="True" Visibility="Collapsed" Height="35" Width="35"/>
+                    <TextBlock x:Name="BottomBarMessage" Margin="15,15,10,15.6" Foreground="Gray" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Width="373"></TextBlock>
+                </DockPanel>
+            </DockPanel>
+
+
+        </materialDesign:ColorZone>
+
+    </Grid>
+</Window>

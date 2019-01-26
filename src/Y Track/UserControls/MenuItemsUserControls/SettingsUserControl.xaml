@@ -1,0 +1,216 @@
+﻿<UserControl x:Class="Y_Track.UserControls.MenuItemsUserControls.SettingsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Y_Track.UserControls.MenuItemsUserControls"
+             xmlns:properties="clr-namespace:Y_Track.Properties"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" >
+
+    <Grid Background="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock TextWrapping="Wrap" x:Name="DefaultPathFolderName"></TextBlock>
+            <Button x:Name="OutputDirectoryBrowseButton" Click="OutputDirectoryBrowseButton_Click" Grid.Column="1" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="100" ToolTip="Resource name: MaterialDesignRaisedLightDarkButton" Background="#434f50" BorderBrush="#232b2c">
+                Browse
+            </Button>
+            <TextBlock TextWrapping="Wrap" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">Where Do you want Store New Videos :</TextBlock>
+            <TextBlock Grid.Column="2" x:Name="VideoDirectoryPath" Text="{Binding Default.OutputDirectory}" VerticalAlignment="Center" Foreground="Gray"></TextBlock>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock TextWrapping="Wrap"></TextBlock>
+            <Button Grid.Column="1" x:Name="DatabaseDirectoryBrowseButton" Click="DatabaseDirectoryBrowseButton_Click" Style="{StaticResource MaterialDesignRaisedDarkButton}" Width="100" ToolTip="Resource name: MaterialDesignRaisedLightDarkButton" Background="#434f50" BorderBrush="#232b2c">
+                Browse
+            </Button>
+            <TextBlock TextWrapping="Wrap" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">Where Do you want Store Videos Information Database :</TextBlock>
+            <TextBlock Grid.Column="2" x:Name="DatabaseDirectory" Text="{Binding Default.DatabaseDirectory}" VerticalAlignment="Center" Foreground="Gray"></TextBlock>
+        </Grid>
+
+        <Separator Grid.Row="0" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">Do You want To Run Tracker On Application Startup :</TextBlock>
+            <TextBlock TextWrapping="Wrap" Grid.Column="2" Padding="5" FontSize="12" x:Name="RunTrackerOnStartupCheckBox"></TextBlock>
+            <ToggleButton x:Name="RunOnStartUp"  IsChecked="{Binding Default.RunApplicationOnStartup}" Grid.Column="1" Style="{StaticResource MaterialDesignSwitchDarkToggleButton}" Background="#434f50" BorderBrush="#232b2c" ToolTip="MaterialDesignSwitchDarkToggleButton"  />
+
+        </Grid>
+
+        <Separator Grid.Row="1" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <ToggleButton  Grid.Column="1" IsChecked="{Binding Default.NotifyNewCapturedVideos}" Style="{StaticResource MaterialDesignSwitchDarkToggleButton}" Background="#434f50" BorderBrush="#232b2c" ToolTip="MaterialDesignSwitchDarkToggleButton"  />
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">Do You Want to be notefied for each new captured video :</TextBlock>
+            <TextBlock TextWrapping="Wrap" Grid.Column="2" Padding="5" FontSize="16" x:Name="NotifyNewVideos"></TextBlock>
+        </Grid>
+
+        <Separator Grid.Row="2" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">What the application should do when new videos are captured ? :</TextBlock>
+            <StackPanel VerticalAlignment="Center"  Grid.Column="1" Orientation="Vertical">
+                <RadioButton GroupName="NewVideosCaptureBehaviorGroup" Margin="30,0 0,0" FontSize="14" FontWeight="Bold" Style="{StaticResource MaterialDesignRadioButton}" Tag="True" Background="#434f50" BorderBrush="#232b2c">
+                    Ask me What to Do
+                </RadioButton>
+                <RadioButton GroupName="NewVideosCaptureBehaviorGroup" Margin="30,0 0,0" FontSize="14" FontWeight="Bold" Style="{StaticResource MaterialDesignRadioButton}" Tag="True" Background="#434f50" BorderBrush="#232b2c">
+                    Store it anyway
+                </RadioButton>
+            </StackPanel>
+        </Grid>
+        <Separator Grid.Row="3" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <ToggleButton  Grid.Column="1" Style="{StaticResource MaterialDesignSwitchDarkToggleButton}" Background="#434f50" BorderBrush="#232b2c" ToolTip="MaterialDesignSwitchDarkToggleButton" IsChecked="False" />
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">Can We Send Information About your running Y-Track application so we can keep it up and running ?</TextBlock>
+            <TextBlock TextWrapping="Wrap" Grid.Column="2" Padding="5" FontSize="16" x:Name="SendValuableInformation"></TextBlock>
+        </Grid>
+
+        <Separator Grid.Row="4" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">For How Much time The Nofitication <Underline>Message</Underline> Should Remain ?</TextBlock>
+            <TextBox  x:Name="NotificationMessageTimeOut" Style="{x:Null}" Width="100" Text="{Binding Default.NotificationMessageTimeout}"  Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1" Margin="100 0 0 0" PreviewTextInput="NumberValidationTextBox"/>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="Gray" Margin="-30">In Microseconds</TextBlock>
+        </Grid>
+
+        <Separator Grid.Row="5" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="7">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">For How Much time The Nofitication <Underline>Dialog</Underline> Should Remain ?</TextBlock>
+            <TextBox x:Name="NotificationDialogTimeout" Style="{x:Null}" Width="100" Text="{Binding Default.NotificationDialogTimeout}"  Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1" Margin="100 0 0 0" PreviewTextInput="NumberValidationTextBox"/>
+            <TextBlock  Grid.Column="2" VerticalAlignment="Center" Foreground="Gray" Margin="-30">In Microseconds</TextBlock>
+        </Grid>
+
+
+        <Separator Grid.Row="6" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">What is the Port You want YTrack Proxy Interceptor to operate on (0 means let YTack choose it)?</TextBlock>
+            <TextBox x:Name="DefaultProxyPort" Style="{x:Null}" Width="100" Text="{Binding Default.DefaultProxyPort}"  Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1" Margin="0 0 0 0" PreviewTextInput="NumberValidationTextBox"/>
+            <TextBlock  Grid.Column="2" VerticalAlignment="Center" Foreground="Gray" Margin="-30">Range is from 11000 To 65000</TextBlock>
+        </Grid>
+
+
+        <Separator Grid.Row="7" Background="#eee" VerticalAlignment="Bottom"/>
+
+
+        <Grid Grid.Row="9">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <ToggleButton x:Name="ReencodeMediaFallback" IsChecked="{Binding Default.FallBackToEncodeMedia}"  Grid.Column="1" Style="{StaticResource MaterialDesignSwitchDarkToggleButton}" Background="#434f50" BorderBrush="#232b2c" ToolTip="MaterialDesignSwitchDarkToggleButton" />
+            <TextBlock  TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">When new Videos Are Captured , the Default for YTrack Is to Copy Their media Stream without Reencode them (Output is Webm Containers) , Do want to Encode them (Convert them to MP4)?</TextBlock>
+        </Grid>
+
+
+        <Separator Grid.Row="8" Background="#eee" VerticalAlignment="Bottom"/>
+
+
+        <Grid Grid.Row="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <ToggleButton x:Name="DraggableNotification" IsChecked="{Binding Default.NotificationDraggable}" Grid.Column="1" Style="{StaticResource MaterialDesignSwitchDarkToggleButton}" Background="#434f50" BorderBrush="#232b2c" ToolTip="MaterialDesignSwitchDarkToggleButton"  />
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">Do you want Notifications to be Draggable ?</TextBlock>
+            <TextBlock TextWrapping="Wrap" Grid.Column="2" Padding="5" FontSize="16" x:Name="DraggableNotificationPanel"></TextBlock>
+        </Grid>
+
+        <Separator Grid.Row="9" Background="#eee" VerticalAlignment="Bottom"/>
+
+
+        <Grid Grid.Row="11">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock TextWrapping="Wrap" Grid.Column="0" Padding="5" FontWeight="Bold" VerticalAlignment="Center" FontSize="14">How many Videos You want to be read at startup?</TextBlock>
+            <TextBox x:Name="NumberOfStartupVideosTextBox" Style="{x:Null}" Width="100" Text="{Binding Default.NumberOfVideosShowAtStartup}"  Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1" Margin="0 0 0 0" PreviewTextInput="NumberValidationTextBox"/>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="Gray" Margin="-30">number of videos</TextBlock>
+        </Grid>
+
+
+        <Separator Grid.Row="10" Background="#eee" VerticalAlignment="Bottom"/>
+
+        <Grid Grid.Row="12">
+            <Button  Click="SaveButton_Click"
+                Style="{StaticResource MaterialDesignRaisedDarkButton}" Background="#434f50" BorderBrush="#232b2c"
+                Content="Save"
+                Margin="2,0" />
+        </Grid>
+
+    </Grid>
+</UserControl>
