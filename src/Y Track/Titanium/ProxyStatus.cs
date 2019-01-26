@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Y_Track.Titanium
 {
+    /// <summary>
+    /// represent the proxy status
+    /// </summary>
     public enum ProxyStatus
     {
         Started,
