@@ -7,7 +7,12 @@ namespace Y_Track.Helpers
 {
     public class AnimationHelper
     {
-
+        /// <summary>
+        /// animate a control opacity (fading it in/out)
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         public static void AnimateOpacity(DependencyObject target, double from, double to)
         {
             var opacityAnimation = new DoubleAnimation

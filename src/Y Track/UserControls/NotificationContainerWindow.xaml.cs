@@ -20,6 +20,9 @@ using UserControl = System.Windows.Controls.UserControl;
 
 namespace Y_Track.UserControls
 {
+    /// <summary>
+    /// a Message without button or a Y/N Dialog
+    /// </summary>
     public enum NotificationType
     {
         Message,
@@ -37,8 +40,7 @@ namespace Y_Track.UserControls
         public NotificationType NotificationType { set; get; }
         // freeze notification closing timer when the notification is hovered
         private bool FreezeClose = false;
-        //public double NotificationOpacity { get; set; } = 0.8;
-
+        
         public NotificationContainerWindow(NotificationYNDialog content)
         {
             InitializeComponent();
@@ -47,7 +49,10 @@ namespace Y_Track.UserControls
         }
 
      
-
+        /// <summary>
+        /// Notification Inner Content
+        /// </summary>
+        /// <param name="content"></param>
         public NotificationContainerWindow(UserControl content)
         {
             InitializeComponent();
@@ -59,6 +64,10 @@ namespace Y_Track.UserControls
             this._proceedClose();
         }
 
+        /// <summary>
+        /// constructor to initialize the notification with it's content
+        /// </summary>
+        /// <param name="content"></param>
         public NotificationContainerWindow(NotificationVideoCard content)
         {
             InitializeComponent();
@@ -157,7 +166,11 @@ namespace Y_Track.UserControls
             CloseStoryBoard.Begin();
         }
 
-
+        /// <summary>
+        /// tiggered when the notification end
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void Storyboard_Completed(object sender, EventArgs e)
         {
             Timer timer = new Timer();

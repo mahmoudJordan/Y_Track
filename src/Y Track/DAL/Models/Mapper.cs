@@ -19,6 +19,12 @@ namespace Y_Track.DAL.Models
             }
         }
 
+
+        /// <summary>
+        /// Map YoutubeVideoInfo from Youtube_Video
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
         public YoutubeVideoInfo FromYoutubeVideoToYoutubeVideoInfo(Youtube_Video video)
         {
             return new YoutubeVideoInfo()
@@ -30,20 +36,6 @@ namespace Y_Track.DAL.Models
                 Title = video.Title,
             };
         }
-
-        //public Youtube_Video Youtube_VideoFromYoutubeVideoInfo(YoutubeVideoInfo info)
-        //{
-        //    return new Youtube_Video()
-        //    {
-        //        Author = info.Author,
-        //        Description = info.Description,
-        //        Duration = info.Duration,
-        //        PhysicalPath = info.PhysicalPath,
-        //        Title = info.Title,
-        //        Id = info.Id
-        //    };
-        //}
-       
 
         protected Mapper() { }
     }

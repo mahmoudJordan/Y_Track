@@ -25,7 +25,12 @@ namespace Y_Track.UserControls
             InitializeComponent();
         }
 
-
+        /// <summary>
+        /// set inner context of the notification
+        /// </summary>
+        /// <param name="messageTitle"></param>
+        /// <param name="messageText"></param>
+        /// <param name="_type"></param>
         public void SetMessageText(string messageTitle , string messageText , NotificationMessageType _type)
         {
             this.MessageText.Text = messageText;

@@ -8,6 +8,12 @@ namespace Y_Track.Extentions
 {
     public static class Misc
     {
+
+        /// <summary>
+        /// read the whole stream and return byte[]
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static byte[] ReadFully(this System.IO.Stream input)
         {
             byte[] buffer = new byte[16 * 1024];
@@ -21,6 +27,7 @@ namespace Y_Track.Extentions
                 return ms.ToArray();
             }
         }
+
 
         public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key,
        TValue defaultValue = default(TValue))

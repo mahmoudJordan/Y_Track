@@ -11,8 +11,19 @@ namespace FFMpeg
 {
     public class FFMpegMultiplexer : IDisposable
     {
+        /// <summary>
+        ///  Video File Path
+        /// </summary>
         public string VideoInput { get; private set; }
+
+        /// <summary>
+        /// Audio File Path
+        /// </summary>
         public string AudioInput { get; private set; }
+
+        /// <summary>
+        /// the Extention of the input file
+        /// </summary>
         public string Extention { get; private set; }
 
         private string _path;
@@ -26,12 +37,27 @@ namespace FFMpeg
         private string _standardOutputContent = null;
         private string _standardErrorContent = null;
 
+        /// <summary>
+        /// Report multiplexing progress
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="progess"></param>
         public delegate void MultiplexingProgressChanged(object sender, double progess);
         public event MultiplexingProgressChanged OnMultiplexingProgressChanged;
 
+        /// <summary>
+        /// report multiplixing complete
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="meea"></param>
         public delegate void MultiplexingCompleted(object sender, MultiplexingExitedEventArguments meea);
         public event MultiplexingCompleted OnMultiplixingComplete;
 
+        /// <summary>
+        /// report multiplixing failure
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="exception"></param>
         public delegate void MultiplexingFailed(object sender, Exception exception);
         public event MultiplexingFailed OnMultiplixingFailed;
 
@@ -45,7 +71,9 @@ namespace FFMpeg
             _configureProcessStart();
         }
 
-
+        /// <summary>
+        /// configure process start info
+        /// </summary>
         private void _configureProcessStart()
         {
 
@@ -85,6 +113,10 @@ namespace FFMpeg
             _handleOutput(o);
         }
 
+        /// <summary>
+        /// parse the output 
+        /// </summary>
+        /// <param name="o"></param>
         private void _handleOutput(DataReceivedEventArgs o)
         {
             double? encodedSeconds = _parseOutputEncodedSeconds(o.Data);
@@ -96,6 +128,10 @@ namespace FFMpeg
             OnMultiplexingProgressChanged?.Invoke(this, percentage);
         }
 
+        /// <summary>
+        /// get the duration from the parsed output
+        /// </summary>
+        /// <returns></returns>
         private async Task<double?> _getDurationSeconds()
         {
             string prefix = "Duration: ";
@@ -104,6 +140,11 @@ namespace FFMpeg
             return _matchSecondsPattern(prefix, informationString, durationExpression);
         }
 
+        /// <summary>
+        /// search the output against encoded seconds
+        /// </summary>
+        /// <param name="currentOutput"></param>
+        /// <returns></returns>
         private double? _parseOutputEncodedSeconds(string currentOutput)
         {
             string prefix = "time=";
@@ -111,7 +152,13 @@ namespace FFMpeg
             return _matchSecondsPattern(prefix, currentOutput, durationExpression);
         }
 
-
+        /// <summary>
+        /// match a string in a form of hh:mm:ss.jj to extract the time in seconds
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="informationString"></param>
+        /// <param name="durationExpression"></param>
+        /// <returns></returns>
         private double? _matchSecondsPattern(string prefix, string informationString, string durationExpression)
         {
             Regex regex = new Regex(durationExpression);
@@ -125,13 +172,21 @@ namespace FFMpeg
             else return null;
         }
 
-
-
+        /// <summary>
+        /// start multiplixing
+        /// </summary>
+        /// <returns></returns>
         public Task<Process> Muliplix()
         {
             return _startMultiplixing(false);
         }
 
+        /// <summary>
+        /// get FFMPEG Arguments based on encoding flag
+        /// </summary>
+        /// <param name="encode"></param>
+        /// <param name="outputFilePath"></param>
+        /// <returns></returns>
         private string _getMuxingArguments(bool encode, string outputFilePath)
         {
             // each container has it's own parameters 
@@ -143,7 +198,6 @@ namespace FFMpeg
             : "-i \"" + VideoInput + "\" -i  \"" + AudioInput + "\" -c copy \"" + outputFilePath + "\"";
 
         }
-
 
         /// <summary>
         /// resets the curren process and initialize it again 
@@ -198,7 +252,11 @@ namespace FFMpeg
             return _process;
         }
 
-
+        /// <summary>
+        /// process excited handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void _process_Exited(object sender, EventArgs e)
         {
             var exitCode = _process.ExitCode;
@@ -219,6 +277,10 @@ namespace FFMpeg
             }
         }
 
+        /// <summary>
+        /// raise multiplixing complete handler
+        /// </summary>
+        /// <param name="outputFilePath"></param>
         private void _raiseMultiplixingComplete(string outputFilePath)
         {
             OnMultiplixingComplete?.Invoke(this, new MultiplexingExitedEventArguments()

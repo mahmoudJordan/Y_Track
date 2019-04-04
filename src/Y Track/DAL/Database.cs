@@ -31,6 +31,10 @@ namespace Y_Track.DAL
         }
 
 
+
+        /// <summary>
+        /// initialize the sqllite database
+        /// </summary>
         private void _initializeDatabase()
         {
 
@@ -46,7 +50,10 @@ namespace Y_Track.DAL
             }
         }
 
-
+        /// <summary>
+        /// returns the database directory from settings
+        /// </summary>
+        /// <returns></returns>
         private string _initializeDatabaseOutputDirectory()
         {
             var dbOutputDirectory = Properties.Settings.Default.DatabaseDirectory;
@@ -58,14 +65,20 @@ namespace Y_Track.DAL
             return Properties.Settings.Default.DatabaseDirectory;
         }
 
-
+        /// <summary>
+        /// Seed all tables
+        /// </summary>
+        /// <param name="connection"></param>
         private void _createTables(SQLiteConnection connection)
         {
             connection.CreateTable<Youtube_Video>();
             connection.CreateTable<Thumbnail>();
         }
 
-
+        /// <summary>
+        /// Adds New Video to Database
+        /// </summary>
+        /// <param name="video"></param>
         public void AddVideo(Youtube_Video video)
         {
             try
@@ -81,6 +94,11 @@ namespace Y_Track.DAL
             }
         }
 
+        /// <summary>
+        /// adds new Thumbnail
+        /// </summary>
+        /// <param name="thumbnail"></param>
+        /// <returns></returns>
         public int? AddThumbnail(Thumbnail thumbnail)
         {
             try
@@ -99,6 +117,10 @@ namespace Y_Track.DAL
             }
         }
 
+        /// <summary>
+        /// Delete a video
+        /// </summary>
+        /// <param name="video"></param>
         public void DeleteVideo(Youtube_Video video)
         {
             try
@@ -116,6 +138,10 @@ namespace Y_Track.DAL
             }
         }
 
+        /// <summary>
+        /// return all videos ids 
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<string>> GetAllVideosIds()
         {
             try
@@ -134,7 +160,11 @@ namespace Y_Track.DAL
             }
         }
 
-
+        /// <summary>
+        /// search for videos by names
+        /// </summary>
+        /// <param name="ToMatch"></param>
+        /// <returns></returns>
         public async Task<List<Youtube_Video>> GetVideosLike(string ToMatch)
         {
             try
@@ -159,6 +189,12 @@ namespace Y_Track.DAL
             }
         }
 
+        /// <summary>
+        /// fetch all videos in local youtube videos infos 
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public async Task<List<Youtube_Video>> ReadLocalYoutubeVideosInfo(int startIndex, int pageSize)
         {
             try

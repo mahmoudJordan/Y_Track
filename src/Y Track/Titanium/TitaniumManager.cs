@@ -11,11 +11,22 @@ namespace Y_Track.Titanium
 {
     public class TitaniumManager
     {
+        /// <summary>
+        /// reports proxy status chaning
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public delegate void ProxyStatusChanged(object sender, ProxyStatusEventsArguments e);
         public event ProxyStatusChanged OnUpdateStatus;
 
+        /// <summary>
+        /// singiliton holder
+        /// </summary>
         private static TitaniumManager _instance;
 
+        /// <summary>
+        /// proxy instance
+        /// </summary>
         public ProxyServer Proxy { get; private set; }
         private ExplicitProxyEndPoint explicitProxyEndPoint;
         public static TitaniumManager Instance
@@ -41,7 +52,10 @@ namespace Y_Track.Titanium
         /// </summary>
         protected TitaniumManager() { }
 
-
+        /// <summary>
+        /// Start the proxy and free up resources
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> Start(int runningPort)
         {
             return await Task.Run(() =>
@@ -66,8 +80,10 @@ namespace Y_Track.Titanium
             });
         }
 
-
-
+        /// <summary>
+        /// stop the proxy and free up resources
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> Stop()
         {
             return await Task.Run(() =>

@@ -10,6 +10,10 @@ namespace Y_Track.Helpers
 {
     public class WindowsHelper
     {
+        /// <summary>
+        /// adds the application to startup list
+        /// </summary>
+        /// <param name="start"></param>
         public static void ToggleStartAtStartup(bool start)
         {
             RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);

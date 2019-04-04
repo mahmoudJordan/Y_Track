@@ -12,7 +12,9 @@ namespace Y_Track.Titanium
         public const int INTERNET_OPTION_SETTINGS_CHANGED = 39;
         public const int INTERNET_OPTION_REFRESH = 37;
 
-
+        /// <summary>
+        /// stop the system-wide running proxy
+        /// </summary>
         public static void StopSystemProxy()
         {
             RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
@@ -25,7 +27,10 @@ namespace Y_Track.Titanium
             InternetSetOption(IntPtr.Zero, INTERNET_OPTION_REFRESH, IntPtr.Zero, 0);
         }
 
-
+        /// <summary>
+        /// get the running proxy-wide address
+        /// </summary>
+        /// <returns></returns>
         public static string GetSystemProxyEndPoint()
         {
             try

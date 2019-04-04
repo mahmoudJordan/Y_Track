@@ -15,8 +15,11 @@ namespace Y_Track.FFMpeg
             _path = ffmpegPath;
         }
 
-
-
+        /// <summary>
+        /// spin new process and execute FFMPEG Command
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public async Task<string> Execute(string args)
         {
             using (var process = new Process())
